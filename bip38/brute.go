@@ -7,11 +7,18 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
+	"strings"
 	"sync/atomic"
+	"time"
 )
 
 var totalTried uint64 = 0
+var chunkSize uint64 = 0
 var stopSearch int32 = 0
+var startFrom uint64 = 0
+var offset uint64 = 0
+var startTime = time.Now()
+var statsCalculated = time.Now()
 
 func searchRange(start uint64, finish uint64, encryptedKey string, charset string, pwlen int, c chan string) {
 	cset := []rune(charset)
@@ -31,13 +38,35 @@ func searchRange(start uint64, finish uint64, encryptedKey string, charset strin
 
 		atomic.AddUint64(&totalTried, 1)
 
-		fmt.Printf("%6d passphrases tried (latest guess: %s )     \r", atomic.LoadUint64(&totalTried), guess)
+		fmt.Printf("%6d tries (latest: %s )", atomic.LoadUint64(&totalTried), guess)
+		fmt.Printf("%s", eta())
+		fmt.Printf("\r")
 	}
 	if atomic.LoadInt32(&stopSearch) != 0 {
 		c <- fmt.Sprintf("%d", i-start) // interrupt signal received, announce our position for the resume code
 		return
 	}
 	c <- ""
+}
+
+func eta() string {
+	now := time.Now()
+	activeTime := now.Sub(startTime)
+	workDone := int64(atomic.LoadUint64(&totalTried) - atomic.LoadUint64(&startFrom) - offset)
+	workRemaining := int64(atomic.LoadUint64(&chunkSize)) - workDone
+	if statsCalculated.Before(now.Add(-10 * time.Second)) {
+		statsCalculated = now
+		// fmt.Printf("done: %d; remaining: %d ", workDone, workRemaining)
+		if activeTime.Seconds() > 5 {
+			rate := float64(workDone) / float64(activeTime.Seconds())
+			timeRemaining := time.Second * time.Duration((float64(workRemaining) / rate))
+			doneBy := now.Add(timeRemaining)
+			percent := float64(atomic.LoadUint64(&totalTried)) / float64(atomic.LoadUint64(&chunkSize)) * float64(100)
+			stats := fmt.Sprintf(" [%.*fh up, %.*fh left, %s/s, ETA: %s] %2.2f %%", 2, activeTime.Hours(), 2, timeRemaining.Hours(), strings.TrimSpace(fmt.Sprintf("%3.2f", rate)), doneBy.Format("Jan 2 2006 15:04 MST"), percent)
+			return stats
+		}
+	}
+	return ""
 }
 
 func Brute(routines int, encryptedKey string, charset string, pwlen int, resume uint64) string {
@@ -71,12 +100,14 @@ func BruteChunk(routines int, encryptedKey string, charset string, pwlen int, ch
 
 	spaceSize := uint64(math.Pow(float64(len(charset)), float64(pwlen)))
 	fmt.Printf("Total keyspace size: %d\n", spaceSize)
-	startFrom := uint64(0)
-	chunkSize := spaceSize / uint64(chunks)
+	chunkSize = spaceSize / uint64(chunks)
+	offset = resume * uint64(routines)
 	blockSize := uint64(chunkSize / uint64(routines))
 	if chunks > 1 {
 		startFrom = chunkSize * uint64(chunk)
 		csz := chunkSize
+		// offset = (resume * uint64(routines)) - (uint64(chunkSize) * uint64(chunks))
+		offset = offset - chunkSize*uint64(chunk) //(chunkSize * uint64(chunks))
 		if chunk == chunks-1 {
 			csz = spaceSize - startFrom
 		}

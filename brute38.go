@@ -83,6 +83,7 @@ func main() {
 		resume, _ = strconv.ParseUint(arguments["--resume"].(string), 10, 64)
 	}
 	fmt.Printf("Running brute force for BIP0038-encrypted string on %d CPUs\n", ncpu)
+	fmt.Println("Compiler flags:", runtime.GOOS, runtime.GOARCH)
 	runtime.GOMAXPROCS(ncpu)
 	result := bip38.BruteChunk(ncpu, priv, charset, pwlen, chunk, chunks, resume)
 	if result == "" {
