@@ -56,7 +56,7 @@ func DecryptWithPassphrase(encryptedKey string, passphrase string) string {
 			passFactor = prefactorA
 		}
 
-		passpoint, err := btc.PublicFromPrivate(passFactor, true)
+		passpoint := btc.PublicFromPrivate(passFactor, true)
 		if passpoint == nil {
 			log.Fatal(err)
 		}
@@ -103,7 +103,7 @@ func DecryptWithPassphrase(encryptedKey string, passphrase string) string {
 		privKey.Mul(passFactorBig, factorbBig)
 		privKey.Mod(privKey, bigN)
 
-		pubKey, err := btc.PublicFromPrivate(privKey.Bytes(), compress)
+		pubKey := btc.PublicFromPrivate(privKey.Bytes(), compress)
 		if pubKey == nil {
 			log.Fatal(err)
 		}
