@@ -2,13 +2,15 @@ package bip38
 
 import (
 	"bytes"
-	"code.google.com/p/go.crypto/scrypt"
 	"crypto/aes"
 	"crypto/sha256"
 	"encoding/hex"
-	"github.com/piotrnar/gocoin/btc"
 	"log"
 	"math/big"
+
+	"golang.org/x/crypto/scrypt"
+
+	"github.com/piotrnar/gocoin/lib/btc"
 )
 
 func sha256Twice(b []byte) []byte {

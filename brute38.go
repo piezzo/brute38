@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/cculianu/brute38/bip38"
-	"github.com/docopt/docopt.go"
 	"log"
 	"runtime"
 	"strconv"
 	"strings"
+
+	"./bip38"
+	"github.com/docopt/docopt.go"
 )
 
 var APP_NAME string = "BIP38 Bruteforce Cracker"
@@ -17,7 +18,7 @@ Copyright (c) 2014, Calin Culianu <calin.culianu@gmail.com> 1Ca1inQuedcKdyELCTmN
 Usage:
   brute38 [--chunk=N/T] [--charset=S] [-t N] [--resume=NUM]
   brute38 [--chunk=N/T] [--charset=S] [-t N] [--resume=NUM] <pwlen> <privatekey>
-   
+
 Default key:
   If no privkey is specified, 6PfQoEzqbz3i2LpHibYnwAspwBwa3Nei1rU7UH9yzfutXT7tyUzV8aYAvG is used, with pwlen 4
 
@@ -27,7 +28,7 @@ Specifying a key to crack:
 
 Options:
   --chunk=N/T    For running on multiple machines to search the same space, break space up into T pieces and process piece N
-  --charset=S    The set of characters to use. Defaults to !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_abcdefghijklmnopqrstuvwxyz{|}~. 
+  --charset=S    The set of characters to use. Defaults to !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_abcdefghijklmnopqrstuvwxyz{|}~.
   -t N           Set maximum threads to N
   --resume=NUM   For continuing from a previously-aborted run. Specify the resume offset to continue from, as printed onscreen after a ^C
   -h             Usage Help
