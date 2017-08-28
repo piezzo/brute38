@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"./bip38"
 	"github.com/docopt/docopt.go"
+	"github.com/piezzo/brute38/bip38"
 )
 
 var APP_NAME string = "BIP38 Bruteforce Cracker"
