@@ -25,7 +25,7 @@ go build
 ```
 The above assumes you have Go set up properly and you copied the code into your GOPATH/src somewhere.
 
-If this got you access to your long-lost ridiculous wealth, you know how to reach me. 13MdozN4rwXUytuVB4Pb43VSaXkgHkQ7hj :)
+If this got you access to your long-lost ridiculous wealth, you know how to reach me. 3CNFhj357vEoYXopEHZ1HuzGtb9qopXi3Y :)
 
 
 ## License
